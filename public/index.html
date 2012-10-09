@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Carousel | Twitter Bootstrap 2.0.4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Starter files for implementing Twitter Bootstrap's Carousel -- using Bootstrap version 2.0.4">
+    <meta name="author" content="David Cochran for webdesign.tutsplus.com">
+  </head>
+
+  <body style=" margin: 0px;">
+
+    <div class="" style="width: 100%; height: 99%;">
+      <iframe id="0" style="width: 100%; height: 100%;" src="http://applications.instantplaces.org/stream/?placeId=6&interval=5000"></iframe>
+      <iframe id="1" style="width: 100%; height: 100%;" src="http://applications.instantplaces.org/pins?collectionId=1&placeId=6&interval=10&transition=1000&pinInterval=30&fx=fade"></iframe>
+      <iframe id="2" style="width: 100%; height: 100%;" src="http://testapplications.instantplaces.org/posters/?placeId=6&fx=fade&interval=15&transition=1000"></iframe>
+
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../vendor/assets/javascripts/jquery-1.7.2.min.js"><\/script>')</script>
+
+    <script>
+      var webArray=new Array("http://applications.instantplaces.org/stream/?placeId=6&interval=5000",
+                           "http://applications.instantplaces.org/pins?collectionId=1&placeId=6&interval=10&transition=1000&pinInterval=30&fx=fade",
+                           "http://testapplications.instantplaces.org/posters/?placeId=6&fx=fade&interval=15&transition=1000");        
+      var i = 0, len = webArray.length;
+
+      var ipapps = new Array()
+
+      function ajaxError(request, type, errorThrown)
+      {
+        var message = "There was an error with the AJAX request.\n";
+        switch (type) {
+            case 'timeout':
+                message += "The request timed out.";
+                break;
+            case 'notmodified':
+                message += "The request was not modified but was not retrieved from the cache.";
+                break;
+            case 'parsererror':
+                message += "XML/Json format is bad.";
+                break;
+            default:
+                message += "HTTP Error (" + request.status + " " + request.statusText + ").";
+        }
+        message += "\n";
+        alert(message);
+      }
+
+      function pullApp(){
+        $.ajax({
+          type: 'GET',
+          url: 'apps/pull',
+          dataType: "json",
+          success:function(data){
+            // successful request; do something with the data
+            if (data)
+              ipapps.push(data)
+          },
+          error: ajaxError
+          
+        });
+        setTimeout('pullApp()', 2000)
+      };
+      
+      $(document).ready(function(){
+        $('#0').hide();
+        $('#1').hide();
+        $('#2').hide();
+      });
+
+      function ChangeSrc(app){
+        if(ipapps.length == 0){
+          if((i - 1) >= 0){
+            $('#' + (i - 1)).hide();
+            $('#' + (i - 1)).removeClass('active');
+          }
+          else{
+            $('#2').hide();
+            $('#2').removeClass('active');
+          }
+          $('#' + i).show();
+          $('#' + i).addClass('active');
+          i++;
+          if (i >= len) i = 0;
+          setTimeout('ChangeSrc('+i+')', 5000);
+        }
+        else {
+          $('.active').hide()
+          $('.active').removeClass('active');
+          console.log($('.active'))
+          app = ipapps.shift();
+          $('#' + app).show();
+          $('#' + i).addClass('active');
+          setTimeout('ChangeSrc('+app+')', 10000);
+        }
+
+      };
+
+      $(document).ready(function(){
+        pullApp();
+      });
+  
+      $(document).ready(function(){
+        ChangeSrc(); 
+      });
+
+      
+
+    </script>
+
+
+  </body>
+</html>
